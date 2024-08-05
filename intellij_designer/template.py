@@ -1,6 +1,10 @@
 from langchain_core.pydantic_v1 import BaseModel, Field
 
 
+style_test1="武汉的城市特色，体现它的文化底蕴"
+style_test2="风景好，安静，人少"
+style_test3="刺激，好玩，新奇"
+
 info_promt="""
     下列有一些关于旅行规划的描述，帮我提取其中的信息，以json格式返回。总共八项，包括：目的地、出行时间、旅游风格、必访景点、餐饮偏好、住宿要求、交通方式、预算范围。以下是具体要求：
 目的地：没有提到则返回“无”。
@@ -40,7 +44,7 @@ info_promt="""
 """
 
 
-class Travel(BaseModel):
+class Requirement(BaseModel):
     """游客对旅行的需求信息"""
     destination: str = Field(description="旅行的目的地")
     start_time: list = Field(
@@ -49,7 +53,7 @@ class Travel(BaseModel):
         default=[2,12], description="用长度为2的整型list表示，第一个是整天数，不足一天时为0，第二个是小时数。"
 	)
     style: str = Field(
-        default=None, description="对旅行风格的描述，没有则返回“无”。"
+        default="随便看看", description="对旅行风格的描述，没有则返回“无”。"
 	)
     Must_visit_attractions: list = Field(
         default=[], description="用户提到的具体的一定要去的景点"
@@ -67,10 +71,3 @@ class Travel(BaseModel):
         default=[], description="长度为2的整型数组，第一个元素为预算下限，默认为0，第二个元素为预算上限，没有提到则默认为旅行天数*500"
 	)
     
-path_query="""
-这里有一个整型列表：
-[0, 1, 2, 3, 4, ]
-每个元素代表一个景点的编号，请你设计一个游览顺序，使总路线的长度近似较小即可。
-请以列表的形式返回重新排序后的编号。
-"""
-"""你可以使用工具"get_distance"来根据两个景点的编号获取它们之间的距离。输入的参数为两个整型，分别是两个景点的编号，返回的结果即为两个景点之间的距离/"""

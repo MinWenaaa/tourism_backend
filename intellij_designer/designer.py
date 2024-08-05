@@ -1,5 +1,4 @@
 import intellij_designer.template as template
-from intellij_designer.tools import distance_tool
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
@@ -23,7 +22,7 @@ def get_info(requirement: str) ->dict:
 	model="qwen-turbo"
 )
     
-    output_parser = JsonOutputParser(pydantic_object=template.Travel)
+    output_parser = JsonOutputParser(pydantic_object=template.Requirement)
     prompt = PromptTemplate(
     template="提取用户对旅行的需求信息，没有提到或无特别要求或不需要则返回“无”.\n{format_instructions}\n{query}\n",
     input_variables=["query"],
@@ -43,16 +42,18 @@ def get_resort(query: str, num: int) -> list:
     #embedding.get_vectorstore()
     embedding_model = DashScopeEmbeddings(dashscope_api_key=os.getenv("ALI_API_KEY"))
     db3 = Chroma(
-        persist_directory="./chroma_db", 
+        persist_directory="intellij_designer/chroma_db", 
         embedding_function=embedding_model
         )
     docs = db3.similarity_search(query, num)
     resorts = []
     for doc in docs:
-        resort=doc.metadata.get("name")
+        resort=doc.metadata.get("id")
         resorts.append(resort)
         
     return resorts
+
+
 """
 def path():
     

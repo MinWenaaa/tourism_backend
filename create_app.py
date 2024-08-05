@@ -2,9 +2,10 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 
+
 app = Flask(__name__)
 
-HOSTNAME = "182.92.251.24"
+HOSTNAME = "121.41.170.185"
 PORT = 3306
 USERNAME = "root"
 PASSWORD = "123456"

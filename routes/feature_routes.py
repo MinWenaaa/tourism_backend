@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy.sql import func
-from models.db_model import pois
-from parser.models_parser import poi_list_view_item, poi_detail_item
+from model.db_model import Comments, pois
+from parser.models_parser import poi_list_view_item, detail_item
 from parser.msg_parser import success, args_missing, data_not_exist
 from create_app import db
 
@@ -39,7 +39,7 @@ def get_item_Detail():
     if not poi:
         return jsonify(data_not_exist())
     
-    result = poi_detail_item(poi)
+    result = detail_item(poi)
 
     query = db.session.query(
         func.ST_X(pois.plocation).label('x'),
@@ -50,3 +50,18 @@ def get_item_Detail():
     result['plocation'] = coordination
 
     return jsonify(success(result))
+
+
+@feature_bp.route('/comments', methods=['GET'])
+def get_poi_comment():
+
+    id = request.args.get('id')
+    if not id:
+        return jsonify(args_missing)
+    
+    id = int(id)
+    comments_list = Comments.query.filter_by(cpid=id).all()
+
+    result = [detail_item(com) for com in comments_list]
+    return jsonify(success(result))
+

@@ -3,6 +3,7 @@
     "python.autoComplete.extraPaths": [],
     "python.analysis.extraPaths": [
         "./models",
-        "./routes"
+        "./routes",
+        "./intellij_designer"
     ]
 }

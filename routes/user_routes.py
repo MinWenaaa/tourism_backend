@@ -1,5 +1,5 @@
 from flask import Blueprint
-from models.db_model import Users
+from model.db_model import Users
 from create_app import db
 
 

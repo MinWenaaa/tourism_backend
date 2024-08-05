@@ -18,7 +18,6 @@ class pois(db.Model):
     precommended_duration = db.Column(db.String(50), nullable=True)
     prank = db.Column(db.String(4), nullable=True)
 
-    
 
 
 class TravelPlan(db.Model):
@@ -45,3 +44,16 @@ class Users(db.Model):
     def __repr__(self):
         return f'<User {self.uid}>'
     
+    
+
+class Comments(db.Model):
+    __tablename__ = 'comments'
+
+    cid = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    cuid = db.Column(db.Integer, nullable=False)
+    ctime = db.Column(db.Date, nullable=False)
+    cgrade = db.Column(db.Float, nullable=True)
+    ccontent = db.Column(db.String(2000), nullable=True)
+    cpname = db.Column(db.String(45), nullable=True)
+    cpid = db.Column(db.Integer, nullable=True)
+    cphoto = db.Column(db.JSON, nullable=True)

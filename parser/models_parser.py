@@ -21,7 +21,7 @@ def poi_list_view_item(poi):
         'prank': poi.prank
     }
 
-def poi_detail_item(poi):
+def detail_item(poi):
     model_dict = {}
     
     model_columns = [c_attr.key for c_attr in inspect(poi).mapper.column_attrs]
@@ -37,3 +37,4 @@ def poi_detail_item(poi):
             model_dict[column] = value
     
     return model_dict
+

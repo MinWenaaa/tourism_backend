@@ -27,7 +27,7 @@ def get_items():
 
 
 @feature_bp.route('/detail', methods=['GET'])
-def get_item_Detail():
+def fuzzy_search():
     id = request.args.get('id')
 
     if not id:
@@ -61,7 +61,32 @@ def get_poi_comment():
     
     id = int(id)
     comments_list = Comments.query.filter_by(cpid=id).all()
+    print(type(comments_list[0]))
 
     result = [detail_item(com) for com in comments_list]
     return jsonify(success(result))
 
+
+
+@feature_bp.route('/search', methods=['GET'])
+def get_item_Detail():
+    search_keyWord = request.args.get('name')
+
+    if not search_keyWord:
+        return jsonify(args_missing)
+
+    query = db.session.query(
+        pois.pname, pois.pintroduce_short, pois.paddress
+    ).filter(
+        pois.ptype == '旅游景点',
+        pois.pname.like(f'%{search_keyWord}%')
+    ).limit(5).all()
+    
+    result = [];
+
+    for item in query:
+        Dict = {key: value for key, value in item._asdict().items()}
+        result.append(Dict)
+
+
+    return jsonify(success(result))

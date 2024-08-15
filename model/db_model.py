@@ -37,12 +37,13 @@ class TravelPlan(db.Model):
 
 
 class Users(db.Model):
+    __tablename__ = 'users'
+
     uid = db.Column(db.Integer, primary_key=True)
     upassword = db.Column(db.String(20), nullable=False, default='000000')
-    uname = db.Column(db.String(30), nullable=True)
-
-    def __repr__(self):
-        return f'<User {self.uid}>'
+    uname = db.Column(db.String(30))
+    upic = db.Column(db.String(255))
+    unickname = db.Column(db.String(20))
     
     
 
@@ -57,3 +58,25 @@ class Comments(db.Model):
     cpname = db.Column(db.String(45), nullable=True)
     cpid = db.Column(db.Integer, nullable=True)
     cphoto = db.Column(db.JSON, nullable=True)
+
+
+
+class Event(db.Model):
+    __tablename__ = 'event'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    point = db.Column(db.String(255), nullable=False)
+    photo = db.Column(db.String(255), nullable=False)
+    rid = db.Column(db.Integer, nullable=False)
+    text = db.Column(db.Text, nullable=False)
+
+
+
+class Record(db.Model):
+    __tablename__ = 'record'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    point = db.Column(db.JSON, nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    uid = db.Column(db.Integer, nullable=True)
+

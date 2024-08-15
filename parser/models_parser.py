@@ -38,3 +38,13 @@ def detail_item(poi):
     
     return model_dict
 
+def to_dict(self):
+        columns = self.__table__.columns.keys()
+        
+        data_dict = {}
+        
+        for col in columns:
+            value = getattr(self, col)
+            data_dict[col] = value
+        
+        return data_dict

@@ -71,14 +71,17 @@ def get_poi_comment():
 @feature_bp.route('/search', methods=['GET'])
 def get_item_Detail():
     search_keyWord = request.args.get('name')
+    type = request.args.get('type')
 
     if not search_keyWord:
         return jsonify(args_missing)
 
     query = db.session.query(
-        pois.pname, pois.pintroduce_short, pois.paddress
+        pois.pname, pois.pintroduce_short, pois.paddress,
+        func.ST_X(pois.plocation).label('x'),
+        func.ST_Y(pois.plocation).label('y'),
     ).filter(
-        pois.ptype == '旅游景点',
+        pois.ptype == type,
         pois.pname.like(f'%{search_keyWord}%')
     ).limit(5).all()
     

@@ -43,6 +43,26 @@ def add_user():
     return "创建成功"
 
 
+@user_bp.route("/create_record", methods=['POST'])
+def create_record():
+
+    data = request.get_json()
+    print(data)
+    id = data['id']
+    point = data['start']
+    name = data['name']
+    print(name)
+
+    record = Record(uid = id, point = [point], name=name)
+    print(record.name)
+
+    db.session.add(record)
+    db.session.commit()
+
+    return jsonify(success({"id": record.id}))
+
+
+
 @user_bp.route("/records", methods=['GET'])
 def get_records():
     id = request.args.get('id')
@@ -54,6 +74,35 @@ def get_records():
     for record in record_list:
         dict = to_dict(record)
         dict['point']=json.loads(record.point)
+        print(type(record.point))
+        #dict['point']=record.point
         result_list.append(dict)
 
     return jsonify(success(result_list))
+
+
+
+@user_bp.route("/push_point", methods=['POST'])
+def push_point():
+
+    data = request.get_json()
+    id = data['id']
+    newPoint = data['point']
+
+    record = Record.query.get(id)
+    if not isinstance(record.point, list):
+        if isinstance(record.point, str):
+            record.point = json.loads(record.point)
+        else:
+            record.point = [] 
+    
+    #print(record.point)
+    record.point.append(newPoint)
+    record.point = json.dumps(record.point)
+    #print(record.point)
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+    return jsonify(success({}))

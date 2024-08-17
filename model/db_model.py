@@ -80,3 +80,14 @@ class Record(db.Model):
     name = db.Column(db.String(255), nullable=False)
     uid = db.Column(db.Integer, nullable=True)
 
+
+
+class Plan(db.Model):
+    __tablename__ = 'plan'  
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(255), nullable=False)
+    itidata = db.Column(db.JSON, nullable=False)
+    uid = db.Column(db.Integer, nullable=False)
+    pic = db.Column(db.String(255), nullable=False, default='https://d-hbing.huaban.com/661d35eca632861478a559fbd5fd02894b2223cc48-D4lkwtfw120webp')
+    edittime = db.Column(db.String(31), nullable=True)

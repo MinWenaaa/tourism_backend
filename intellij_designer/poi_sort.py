@@ -6,13 +6,13 @@ import math
 
 def sort(id_list, location_list):
 
-    AntCount = 50 #蚂蚁数量
+    AntCount = 80 #蚂蚁数量
     city_count = len(id_list) #城市数量
     alpha = 1  # 信息素重要程度因子
     beta = 2  # 启发函数重要程度因子
     rho = 0.1 #挥发速度
     Iter = 0  # 迭代初始值
-    MAX_iter = 50  # 最大迭代值
+    MAX_iter = 80  # 最大迭代值
     Q = 1
 
     Distance = np.zeros((city_count, city_count))

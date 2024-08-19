@@ -1,10 +1,11 @@
 import json
-from flask import Blueprint, jsonify, request
+import os
+from flask import Blueprint, jsonify, request, send_from_directory
 from sqlalchemy.orm.exc import NoResultFound
-from model.db_model import Record, Users
+from model.db_model import Event, Record, Users
 from create_app import db
 from parser.models_parser import to_dict
-from parser.msg_parser import data_not_exist, success
+from parser.msg_parser import args_missing, data_not_exist, success
 
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
@@ -67,18 +68,40 @@ def create_record():
 def get_records():
     id = request.args.get('id')
 
-    record_list = Record.query.filter_by(uid=id).all()
+    record_list =  db.session.query(
+        Record.id, Record.name,
+    ).filter_by(uid=id).all()
     #print(type(record_list[0]))
 
     result_list = []
     for record in record_list:
-        dict = to_dict(record)
-        dict['point']=json.loads(record.point)
-        print(type(record.point))
-        #dict['point']=record.point
-        result_list.append(dict)
+        Dict = {key: value for key, value in record._asdict().items()}
+        print(dict)
 
+        result_list.append(Dict)
+
+    print(result_list)
     return jsonify(success(result_list))
+
+@user_bp.route("/recordDetail", methods=['GET'])
+def get_record_detail():
+    id = request.args.get('id')
+
+    record = Record.query.filter_by(id=id).first()
+
+
+    query = Event.query.filter_by(rid=id).all()
+
+    event_list = []
+    for event in query:
+        Dict = to_dict(event)
+        event_list.append(Dict)
+    #print(type(result), type(event_list))
+
+    result = {"points": json.loads(record.point),
+              "events": event_list},
+
+    return jsonify(success(result))
 
 
 
@@ -87,6 +110,7 @@ def push_point():
 
     data = request.get_json()
     id = data['id']
+    print(id)
     newPoint = data['point']
 
     record = Record.query.get(id)
@@ -106,3 +130,42 @@ def push_point():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
     return jsonify(success({}))
+
+
+@user_bp.route('/insertEvent', methods=['POST'])
+def upload_image():
+ 
+    if 'file' not in request.files:
+        return jsonify(args_missing())
+    
+    file = request.files['file']
+    
+    if file.filename == '':
+        return jsonify(args_missing())
+    
+    if file:
+        rid = request.form.get('id')
+        point = request.form.get('point')
+        text = request.form.get('text')
+
+        event = Event(rid=rid, point=point, text=text)
+        db.session.add(event)
+        db.session.commit()
+
+        id = event.id
+        
+        filename = str(id)+".jpg"
+        file.save(os.path.join('C:\\photos', filename))
+        
+        return jsonify(success({'id':id}))
+    
+
+@user_bp.route('/download/<filename>', methods=['GET'])
+def download_file(filename):
+    try:
+
+        return send_from_directory(directory='C:\\photos',
+                                   path=filename,
+                                   as_attachment=True)  # 设置为附件，以便下载
+    except FileNotFoundError:
+        return jsonify

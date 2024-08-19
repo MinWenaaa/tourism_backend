@@ -7,6 +7,7 @@ def poi_list_view_item(poi):
         photo = poi.pphoto[0]
     return {
         'pid': poi.pid,
+        'ptype': poi.ptype,
         'pname': poi.pname,
         'pclass': poi.pclass,
         'paddress': poi.paddress,

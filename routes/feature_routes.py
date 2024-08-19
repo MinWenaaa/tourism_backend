@@ -25,6 +25,11 @@ def get_items():
 
     return jsonify(success(pois_list))
 
+@feature_bp.route('/mapview', methods=['GET'])
+def get_item():
+    id = request.args.get('id')
+    POI = pois.query.filter_by(pid=id).first()
+    return jsonify(success(poi_list_view_item(POI)))
 
 @feature_bp.route('/detail', methods=['GET'])
 def fuzzy_search():

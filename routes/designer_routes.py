@@ -1,5 +1,6 @@
 from flask import Blueprint, json, request, jsonify
 from sqlalchemy import func
+from intellij_designer.designer import get_resort
 from intellij_designer.output import tourism_deisgner
 from model.db_model import Plan, Record, pois
 from create_app import db
@@ -7,6 +8,25 @@ from parser.models_parser import detail_item
 from parser.msg_parser import args_missing, data_not_exist, success
 
 designer_bp = Blueprint('designer', __name__)
+
+@designer_bp.route("/chat", methods=['GET'])
+def chat():
+    requirement = request.args.get('requirement')
+    id_list = get_resort(requirement,3)
+    result = []
+    for id in id_list:
+        query = db.session.query(
+            pois.pid, pois.pname, pois.pintroduce_short, pois.paddress, pois.pphoto,
+            func.ST_X(pois.plocation).label('x'),
+            func.ST_Y(pois.plocation).label('y'),
+        ).filter_by(pid = id).first()
+        Dict = {key: value for key, value in query._asdict().items()}
+        
+        if Dict['pphoto'] is not None:
+            Dict['pphoto']= Dict['pphoto'][0]
+        result.append(Dict)
+    return jsonify(success(result))
+
 
 @designer_bp.route("/designer", methods=['POST'])
 def test():
@@ -20,10 +40,10 @@ def test():
     if not requirement:
         return jsonify(args_missing)
     
-    id_list = tourism_deisgner(requirement, num)
+    id_list = tourism_deisgner(requirement, num*5)
 
     result_list = []
-    for i in range(0, int(num)//3):
+    for i in range(0, int(num)):
         temp = []
         for j in range(0,3):
             query = db.session.query(
@@ -43,6 +63,19 @@ def test():
     return jsonify(success(result_list))
 
 
+@designer_bp.route("/getItiData", methods=['GET'])
+def getItiData():
+    id = request.args.get('id')
+    POI = db.session.query(
+            pois.pid, pois.pname, pois.pintroduce_short, pois.paddress, pois.pphoto,
+            func.ST_X(pois.plocation).label('x'),
+            func.ST_Y(pois.plocation).label('y'),
+        ).filter_by(pid=id).first()
+    Dict = {key: value for key, value in POI._asdict().items()}
+    if Dict['pphoto'] is not None:
+        Dict['pphoto']= Dict['pphoto'][0]
+    return jsonify(success(Dict))
+
 
 @designer_bp.route("/push_plan", methods = ['POST'])
 def push_plan():
@@ -51,11 +84,29 @@ def push_plan():
     itidata = data['itidata']
     uid = data['uid']
     pic = data['pic']
+    print(pic)
+    id = data['id']
     edittime = data['edittime']
 
-    plan = Plan(name=name, itidata=itidata, uid=uid, pic=pic, edittime=edittime)
-    db.session.add(plan)
-    db.session.commit()
+    if not id:
+        plan = Plan(name=name, itidata=itidata, uid=uid, pic=pic, edittime=edittime)
+        db.session.add(plan)
+    
+    else:
+        plan = Plan.query.get(id)
+
+        plan.name = name
+        plan.itidata = itidata
+        plan.pic = pic
+        plan.edittime = edittime
+
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+    
+    print(plan.pic)
 
     return jsonify(success({"id": plan.id}))
     
@@ -97,26 +148,3 @@ def get_plans():
         result_list.append(Dict)
 
     return jsonify(success(result_list))
-
-
-@designer_bp.route("/plan_refresh", methods = ['POST'])
-def refresh():
-    
-
-"""
-@designer_bp.route("/upload_photo", methos=['POST'])
-def upload_photo():
-    if 'file' not in request.files:
-        return "No file part", 400
-    file = request.files['file']
-    if file.filename == '':
-        return "No selected file", 400
-    if file:
-        filename = file.filename
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
-        new_image = Image(filename=filename)
-        db.session.add(new_image)
-        db.session.commit()
-        return f"File {filename} uploaded successfully", 201
-"""

@@ -66,7 +66,6 @@ class Event(db.Model):
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     point = db.Column(db.String(255), nullable=False)
-    photo = db.Column(db.String(255), nullable=False)
     rid = db.Column(db.Integer, nullable=False)
     text = db.Column(db.Text, nullable=False)
 

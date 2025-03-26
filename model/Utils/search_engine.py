@@ -16,17 +16,17 @@ class SearchEngine:
     def query(self, desc: tuple = None, top_k: int = None):
         """
         desc: 用户的正向与负面需求
-        返回 k 个 poi 的 id 与相似度
+        返回按相似度排序的id列表与相似度列表
         """
         pos_desc, neg_desc = desc
         pos_result_list = self.vector_store.similarity_search_with_score(
-            query= pos_desc, k = 10000)
+            query= pos_desc, k = 10000)     # List<tuple<Document, float>>
         
         pos_id_list = [item[0].metadata['id'] for item in pos_result_list]
-        pos_score_list = [item[1] for item in pos_result_list]
+        pos_score_list = [item[1] for item in pos_result_list]      # 按相似度排序
         sorted_indices_desc = np.argsort(pos_id_list)
         pos_id_list = np.array(pos_id_list)[sorted_indices_desc]
-        pos_score_list = np.array(pos_score_list)[sorted_indices_desc]
+        pos_score_list = np.array(pos_score_list)[sorted_indices_desc]      # 按id排序
         if neg_desc not in [None, ""]:
             neg_result_list = self.vector_store.similarity_search_with_score(
                 query = neg_desc, k = 10000)
@@ -39,7 +39,7 @@ class SearchEngine:
         top_k_indices = np.argsort(pos_score_list)[0:top_k]
         print(top_k_indices)
         top_k_ids = pos_id_list[top_k_indices]
-        top_k_scores = pos_score_list[top_k_indices] 
+        top_k_scores = pos_score_list[top_k_indices]        # 按相似度排序
         return top_k_ids, top_k_scores
             
         

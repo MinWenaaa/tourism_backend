@@ -102,7 +102,10 @@ class ItiNera:
         return sorted_id, psedo_must_see_loc
 
         
-    def get_poi_candidates(self, req_topk_pois: list):
+    def get_poi_candidates(self, req_topk_pois_id: list, pseudo_must_see_pois):
+        # req_topk_pois_id.extend(self.must_see_pois)
+
+    def get_full_order(self, all_pairs: list, cluters:list, cluters_order:np.ndarray):
         pass
 
     def solve(self):

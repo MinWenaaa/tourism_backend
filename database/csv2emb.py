@@ -13,7 +13,8 @@ def get_document(file_path: str):
                 page_content = row['desc'],
                 metadata = {
                     "id": row['id'],
-                    "name": row["name"]
+                    "name": row["name"],
+                    "coord": [row["longtitude"], row["latitude"]]
                 }
             ))
     return documents
